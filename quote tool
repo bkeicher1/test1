@@ -1,3 +1,71 @@
-git clone https://github.com/YOUR_USERNAME/nokia-quoting-tool.git
-cd nokia-quoting-tool
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { motion } from "framer-motion";
+
+export default function QuotingTool() {
+  const [items, setItems] = useState([{ description: "", quantity: 1, price: 0 }]);
+  const [tax, setTax] = useState(0);
+
+  const handleInputChange = (index, field, value) => {
+    const newItems = [...items];
+    newItems[index][field] = value;
+    setItems(newItems);
+  };
+
+  const addItem = () => {
+    setItems([...items, { description: "", quantity: 1, price: 0 }]);
+  };
+
+  const calculateTotal = () => {
+    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
+    return { subtotal, grandTotal: subtotal + (subtotal * tax) / 100 };
+  };
+
+  return (
+    <motion.div className="p-6 max-w-3xl mx-auto">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Nokia_Logo.svg" alt="Nokia Logo" className="w-32 mb-4" />
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Unit Price (USD)</TableHead>
+                <TableHead>Total (USD)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Input value={item.description} onChange={(e) => handleInputChange(index, "description", e.target.value)} />
+                  </TableCell>
+                  <TableCell>
+                    <Input type="number" value={item.quantity} onChange={(e) => handleInputChange(index, "quantity", Number(e.target.value))} />
+                  </TableCell>
+                  <TableCell>
+                    <Input type="number" value={item.price} onChange={(e) => handleInputChange(index, "price", Number(e.target.value))} />
+                  </TableCell>
+                  <TableCell>${(item.quantity * item.price).toFixed(2)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Button className="mt-2" onClick={addItem}>Add Item</Button>
+          <div className="mt-4">
+            <label>Tax (%): </label>
+            <Input type="number" value={tax} onChange={(e) => setTax(Number(e.target.value))} />
+          </div>
+          <div className="mt-4 font-bold">Subtotal: ${calculateTotal().subtotal.toFixed(2)}</div>
+          <div className="mt-2 font-bold">Grand Total: ${calculateTotal().grandTotal.toFixed(2)}</div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 
